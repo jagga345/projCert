@@ -1,0 +1,35 @@
+---
+- hosts: testnodes
+  remote_user: ubuntu
+  become: true
+  tasks:
+    - name: set mydistribution
+      ansible.builtin.set_fact:
+        mydistribution: "{{ 'rhel' if (ansible_distribution == 'Red Hat Enterprise Linux') else (ansible_distribution | lower) }}"
+
+    - name: Install Docker
+      ansible.builtin.yum:
+        name:
+          - docker
+        state: latest
+        update_cache: true
+
+    - name: Start Docker
+      ansible.builtin.service:
+        name: "docker"
+        enabled: true
+        state: started
+    - name: Ensure group "docker" exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+    - name: adding ubuntu to docker group
+      user:
+        name: ansibleadmin
+        groups: docker
+        append: yes
+
+Footer
+© 2022 GitHub, Inc.
+Footer navigation
+Terms
